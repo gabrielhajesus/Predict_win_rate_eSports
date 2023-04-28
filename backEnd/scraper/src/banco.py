@@ -11,8 +11,3 @@ class Banco:
     def teams(db):
         teams = db.teams
         return teams
-
-    def convertenome(nome):
-        nome = nome.replace(',', '').replace('-', '').replace(' ', '').replace('(', '').replace(':', '').replace('|', '').replace('?', '').replace('{', '').replace('}', '').replace('`', '').replace('^', '').replace(')', '').replace(
-            '.', '').replace('/', '').replace('"', '').replace('!', '').replace(';', '').replace('+', '').replace('~', '').replace('<', '').replace('>', '').replace('	', '').replace('*', '').replace('\'', '').lower()
-        return nome

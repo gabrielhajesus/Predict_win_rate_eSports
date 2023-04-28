@@ -6,7 +6,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from pymongo import MongoClient
-from urllib.request import Request, urlopen, urlretrieve
+from urllib.request import Request
 from banco import Banco
 from inicia_selenium import iniciaselenium
 
@@ -23,7 +23,7 @@ driver.get(
     "https://www.hltv.org/stats/teams?startDate=2022-10-28&endDate=2023-04-28&minMapCount=30")
 
 # Concorda com os cookies do site
-time.sleep(2)
+time.sleep(1)
 elemento = driver.find_element(
     By.XPATH, '//*[@id="CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll"]')
 driver.execute_script("arguments[0].click();", elemento)

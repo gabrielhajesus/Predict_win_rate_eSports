@@ -1,6 +1,6 @@
 .history
 data/
-src/site/static/img/
+src/banco.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
