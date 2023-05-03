@@ -6,14 +6,16 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:predict/main.dart';
+import 'package:predict/src/app_module.dart';
+import 'package:predict/src/app_widget.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester
+        .pumpWidget(ModularApp(module: AppModule(), child: const AppWidget()));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);
