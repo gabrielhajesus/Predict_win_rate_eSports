@@ -178,3 +178,11 @@ mobile/app.*.map.json
 mobile/android/app/debug
 mobile/android/app/profile
 mobile/android/app/release
+mobile/linux/flutter/generated_plugin_registrant.cc
+mobile/linux/flutter/generated_plugin_registrant.h
+mobile/linux/flutter/generated_plugins.cmake
+mobile/macos/Flutter/GeneratedPluginRegistrant.swift
+mobile/test/widget_test.dart
+mobile/windows/flutter/generated_plugin_registrant.cc
+mobile/windows/flutter/generated_plugin_registrant.h
+mobile/windows/flutter/generated_plugins.cmake
