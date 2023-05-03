@@ -57,17 +57,40 @@ for partida in partidas:
     contador_partidas = contador_partidas - 1
 
     # Oponentes - Nomes dos times
-    time_ganhou = partida.find('table').find(
-        'tbody').find('div', {'class': "line-align team1"}).find('div', {'class': "team"}).getText()
-    time_perdeu = partida.find('table').find(
-        'tbody').find('div', {'class': "line-align team2"}).find('div', {'class': "team"}).getText()
+    team_1 = partida.find('table').find(
+        'tbody').find('div', {'class': "line-align team1"})
 
-    card['adversarios'] = time_ganhou + ' X ' + time_perdeu
+    card['team_1'] = team_1.getText()
+
+    team_2 = partida.find('table').find(
+        'tbody').find('div', {'class': "line-align team2"})
+
+    card['team_2'] = team_2.getText()
 
     # Quem ganhou - Resultado
+    scoreteam_1 = partida.find('table').find(
+        'td', {'class': 'result-score'}).span.getText()
 
-    card['resultado'] = partida.find('table').find(
-        'td', {'class': 'result-score'}).getText()
+    scoreteam_2 = partida.find('table').find(
+        'td', {'class': 'result-score'}).span.findNextSibling().getText()
+
+    if scoreteam_1 > scoreteam_2:
+        card['team_victory'] = team_1.getText()
+        card['victory_score'] = scoreteam_1
+        card['team_defeat'] = team_2.getText()
+        card['defeat_score'] = scoreteam_2
+    elif scoreteam_1 < scoreteam_2:
+        card['team_victory'] = team_2.getText()
+        card['victory_score'] = scoreteam_2
+        card['team_defeat'] = team_1.getText()
+        card['defeat_score'] = scoreteam_1
+
+    if int(scoreteam_1) == 3:
+        card['numero_de_rodadas'] = int(scoreteam_1) + int(scoreteam_2)
+    elif int(scoreteam_1) + int(scoreteam_2) > 3:
+        card['numero_de_rodadas'] = 1
+    else:
+        card['numero_de_rodadas'] = int(scoreteam_1) + int(scoreteam_2)
 
     # link da partida
 

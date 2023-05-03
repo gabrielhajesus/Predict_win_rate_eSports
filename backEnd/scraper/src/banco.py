@@ -15,3 +15,7 @@ class Banco:
     def iem_rio(db):
         iem_rio = db.iem_rio
         return iem_rio
+
+    def iem_rio_partidas(db):
+        iem_rio_partidas = db.iem_rio_partidas
+        return iem_rio_partidas
