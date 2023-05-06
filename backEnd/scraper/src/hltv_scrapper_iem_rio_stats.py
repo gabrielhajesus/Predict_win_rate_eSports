@@ -1,11 +1,6 @@
 import time
 from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from pymongo import MongoClient
 from banco import Banco
 from inicia_selenium import iniciaselenium
 
@@ -24,13 +19,14 @@ for match in iem_rio.find():
     matches.append(match)
 
 n = 1
+numero_da_pagina = 29
 
 # Rodando cada partida
 for match in matches:
     if match['numero_partida'] <= 8:
         # Iniciando o Selenium para cada partida
         driver = iniciaselenium.inicia()
-        print("Chrome Initialized 1")
+        print("Faltam " + str(numero_da_pagina))
 
         # Entrando no link da partida
         driver.get(
@@ -53,7 +49,6 @@ for match in matches:
 
         # Iniciando o Selenium para a pagina detalhada
         driver = iniciaselenium.inicia()
-        print("Chrome Initialized 2")
 
         driver.get(
             "https://www.hltv.org" + link)
@@ -71,16 +66,23 @@ for match in matches:
         # Retirando os dados necessarios
         card = {}
 
-        card['adversarios'] = match['team_1'] + ' X ' + match['team_2']
-        card['team_1'] = match['team_1']
-        card['team_2'] = match['team_2']
+        card['_id'] = numero_da_pagina
 
-        card['team_victory'] = match['team_victory']
+        card['team_1'] = str(match['team_1']).replace(
+            '\n', '')
+        card['team_2'] = str(match['team_2']).replace('\n', '')
+
+        print("Pagina detalha da partida " +
+              card['team_1'] + " X " + card['team_2'])
+
+        card['team_victory'] = str(match['team_victory']).replace('\n', '')
         card['victory_score'] = match['victory_score']
-        card['team_defeat'] = match['team_defeat']
+
+        card['team_defeat'] = str(match['team_defeat']).replace('\n', '')
         card['defeat_score'] = match['defeat_score']
 
         card['partida'] = []
+
         if match['numero_de_rodadas'] > 1:
             # entrando em cada mapa e sabendo quais são os detalhes
             rodadas = paginadetalhada.find('div', {'class': 'contentCol'}).find(
@@ -88,63 +90,77 @@ for match in matches:
                 'div', {'class': 'columns'}).find_all('a')
             mapaatual = 1
             for rodada in rodadas:
-                partida = {}
-                # Iniciando o Selenium
-                driver = iniciaselenium.inicia()
-                print("Chrome Initialized 3")
+                if mapaatual > 1:
+                    partida = {}
+                    # Iniciando o Selenium
+                    driver = iniciaselenium.inicia()
+                    print("Pegando os dados do mapa" + str(mapaatual))
 
-                driver.get(
-                    "https://www.hltv.org" + rodada.get('href'))
-                # Concorda com os cookies do site
-                time.sleep(1)
-                elemento = driver.find_element(
-                    By.XPATH, '//*[@id="CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll"]')
-                driver.execute_script("arguments[0].click();", elemento)
+                    driver.get(
+                        "https://www.hltv.org" + rodada.get('href'))
+                    # Concorda com os cookies do site
+                    time.sleep(1)
+                    elemento = driver.find_element(
+                        By.XPATH, '//*[@id="CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll"]')
+                    driver.execute_script("arguments[0].click();", elemento)
 
-                paginastatusdetalhada = BeautifulSoup(
-                    driver.page_source, 'html.parser')
+                    paginastatusdetalhada = BeautifulSoup(
+                        driver.page_source, 'html.parser')
 
-                partida['placar_vencedor'] = paginastatusdetalhada.find('div', {'class': 'contentCol'}).find(
-                    'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.find('div', {'class': 'bold won'}).getText()
-                partida['placar_perdedor'] = paginastatusdetalhada.find('div', {'class': 'contentCol'}).find(
-                    'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.find('div', {'class': 'bold lost'}).getText()
+                    # placar
+                    partida['placar'] = paginastatusdetalhada.find('div', {'class': 'contentCol'}).find(
+                        'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.findNextSibling().find('div', {'class': 'right'}).getText()
 
-                if mapaatual == 1:
-                    partida['Mapa'] = 'Resumo de todas'
+                    # nome do mapa
+                    nome_do_mapa = paginastatusdetalhada.find('div', {'class': 'contentCol'}).find(
+                        'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.getText()
+                    nome_do_mapa = nome_do_mapa.split('\n')[2]
+                    partida['Mapa'] = nome_do_mapa
+
+                    # team rating
+                    partida['team_rating'] = paginastatusdetalhada.find('div', {'class': 'contentCol'}).find(
+                        'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.findNextSibling().findNextSibling().find('div', {'class': 'right'}).getText()
+
+                    # first kill
+                    partida['first_kills'] = paginastatusdetalhada.find('div', {'class': 'contentCol'}).find(
+                        'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.findNextSibling().findNextSibling().findNextSibling().find('div', {'class': 'right'}).getText()
+
+                    # clutches
+                    partida['clutches_won'] = paginastatusdetalhada.find('div', {'class': 'contentCol'}).find(
+                        'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.findNextSibling().findNextSibling().findNextSibling().findNextSibling().find('div', {'class': 'right'}).getText()
+
+                    card['partida'].append(partida)
+                    mapaatual = mapaatual+1
+
+                    driver.quit()
                 else:
-                    partida['Mapa'] = paginastatusdetalhada.find('div', {'class': 'contentCol'}).find(
-                        'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.text().getText()
-
-                partida['Team rating'] = paginastatusdetalhada.find('div', {'class': 'contentCol'}).find(
-                    'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.findNextSibling().find('div', {'class': 'right'}).getText()
-
-                partida['First kills'] = paginastatusdetalhada.find('div', {'class': 'contentCol'}).find(
-                    'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.findNextSibling().findNextSibling().find('div', {'class': 'right'}).getText()
-
-                partida['Clutches won'] = paginastatusdetalhada.find('div', {'class': 'contentCol'}).find(
-                    'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.findNextSibling().findNextSibling().findNextSibling().find('div', {'class': 'right'}).getText()
-
-                card['partida'].append(partida)
-                mapaatual+1
-
-                driver.quit()
+                    mapaatual = mapaatual + 1
         elif match['numero_de_rodadas'] == 1:
+
+            print("Pegando os dados do mapa")
             partida = {}
-
-            partida['placar_vencedor'] = paginadetalhada.find('div', {'class': 'contentCol'}).find(
-                'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.find('div', {'class': 'bold won'}).getText()
-            partida['placar_perdedor'] = paginadetalhada.find('div', {'class': 'contentCol'}).find(
-                'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.find('div', {'class': 'bold lost'}).getText()
-
-            partida['Team rating'] = paginadetalhada.find('div', {'class': 'contentCol'}).find(
+            # placar
+            partida['placar'] = paginadetalhada.find('div', {'class': 'contentCol'}).find(
                 'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.findNextSibling().find('div', {'class': 'right'}).getText()
 
-            partida['First kills'] = paginadetalhada.find('div', {'class': 'contentCol'}).find(
+            # nome do mapa
+            nome_do_mapa = paginadetalhada.find('div', {'class': 'contentCol'}).find(
+                'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.getText()
+            nome_do_mapa = nome_do_mapa.split('\n')[2]
+            partida['Mapa'] = nome_do_mapa
+
+            # team rating
+            partida['team_rating'] = paginadetalhada.find('div', {'class': 'contentCol'}).find(
                 'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.findNextSibling().findNextSibling().find('div', {'class': 'right'}).getText()
 
-            partida['Clutches won'] = paginadetalhada.find('div', {'class': 'contentCol'}).find(
+            # first kill
+            partida['first_kills'] = paginadetalhada.find('div', {'class': 'contentCol'}).find(
                 'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.findNextSibling().findNextSibling().findNextSibling().find('div', {'class': 'right'}).getText()
 
-            card['partida'].append(partida)
+            # clutches
+            partida['clutches_won'] = paginadetalhada.find('div', {'class': 'contentCol'}).find(
+                'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.findNextSibling().findNextSibling().findNextSibling().findNextSibling().find('div', {'class': 'right'}).getText()
 
+            card['partida'].append(partida)
         iem_rio_partidas.insert_one(card)
+    numero_da_pagina = numero_da_pagina - 1

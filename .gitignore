@@ -186,3 +186,5 @@ mobile/test/widget_test.dart
 mobile/windows/flutter/generated_plugin_registrant.cc
 mobile/windows/flutter/generated_plugin_registrant.h
 mobile/windows/flutter/generated_plugins.cmake
+.vscode/settings.json
+backEnd/algoritmoRegressao/__pycache__/banco.cpython-311.pyc
