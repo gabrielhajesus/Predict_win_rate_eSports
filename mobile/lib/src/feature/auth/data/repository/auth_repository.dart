@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 
 import '../../model/login_interface.dart';
-import '../../model/user.dart';
+import '../../model/domain/user.dart';
 import '../dto/user_dto.dart';
 
 class LoginRepository implements ILogin {

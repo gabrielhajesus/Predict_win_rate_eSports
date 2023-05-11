@@ -1,7 +1,7 @@
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:localization/localization.dart';
 
-import '../model/user.dart';
+import 'domain/user.dart';
 import 'login_interface.dart';
 
 class LoginUseCase {

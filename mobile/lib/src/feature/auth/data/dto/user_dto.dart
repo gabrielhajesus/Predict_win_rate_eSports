@@ -1,4 +1,4 @@
-import '../../model/user.dart';
+import '../../model/domain/user.dart';
 
 class UserDto {
   const UserDto(this.username, this.password);
