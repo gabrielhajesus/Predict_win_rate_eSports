@@ -1,11 +1,6 @@
 import time
 from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from pymongo import MongoClient
 from banco import Banco
 from inicia_selenium import iniciaselenium
 
@@ -74,12 +69,12 @@ for partida in partidas:
     scoreteam_2 = partida.find('table').find(
         'td', {'class': 'result-score'}).span.findNextSibling().getText()
 
-    if scoreteam_1 > scoreteam_2:
+    if int(scoreteam_1) > int(scoreteam_2):
         card['team_victory'] = team_1.getText()
         card['victory_score'] = scoreteam_1
         card['team_defeat'] = team_2.getText()
         card['defeat_score'] = scoreteam_2
-    elif scoreteam_1 < scoreteam_2:
+    elif int(scoreteam_1) < int(scoreteam_2):
         card['team_victory'] = team_2.getText()
         card['victory_score'] = scoreteam_2
         card['team_defeat'] = team_1.getText()
