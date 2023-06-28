@@ -4,5 +4,8 @@ import 'package:predict/src/app_module.dart';
 import 'package:predict/src/app_widget.dart';
 
 void main() {
-  runApp(ModularApp(module: AppModule(), child: const AppWidget()));
+  runApp(ModularApp(
+    module: AppModule(),
+    child: const AppWidget(),
+  ));
 }
