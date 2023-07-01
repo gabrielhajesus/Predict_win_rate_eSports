@@ -78,13 +78,13 @@ for jogo in teams_partidas:
         card1['mapscore'] = int(resultado_team_1)
         card2['mapscore'] = int(resultado_team_2)
 
-        card1['team_rating'] = str(mapa['team_rating']).split(' ')[0]
+        card1['team_rating'] = float(str(mapa['team_rating']).split(' ')[0])
         card1['first_kills'] = int(str(mapa['first_kills']).split(' ')[0])
         card1['clutches_won'] = int(str(
             mapa['clutches_won']).split(' ')[0])
         cards.append(card1)
 
-        card2['team_rating'] = str(mapa['team_rating']).split(' ')[2]
+        card2['team_rating'] = float(str(mapa['team_rating']).split(' ')[2])
         card2['first_kills'] = int(str(mapa['first_kills']).split(' ')[2])
         card2['clutches_won'] = int(str(
             mapa['clutches_won']).split(' ')[2])

@@ -24,9 +24,8 @@ banco_de_dados = Banco.inicia_banco()
 dataset_iem_rio = Banco.dataset_iem_rio(banco_de_dados)
 
 # Guarda todos os dados da Collection em uma lista
-matches = []
-for match in dataset_iem_rio.find():
-    matches.append(match)
+
+matches = dataset_iem_rio.find()
 
 dados = pd.DataFrame(list(matches))
 dados = dados.drop('mapscore', axis=1)
@@ -35,14 +34,19 @@ dados = dados.drop('map_win', axis=1)
 ax = sns.pairplot(dados, y_vars='match_win', x_vars=[
                   'team_rating', 'first_kills', 'clutches_won'])
 plt.show()
-
-with open("saida_texto2.txt", "w", encoding="utf-8") as arquivo:
-    arquivo.write(str(ax))
+ax = sns.pairplot(dados, y_vars='team_rating', x_vars=[
+                  'first_kills', 'clutches_won'])
+plt.show()
+ax = sns.pairplot(dados, y_vars='first_kills', x_vars=[
+                  'team_rating', 'clutches_won'])
+plt.show()
+ax = sns.pairplot(dados, y_vars='clutches_won', x_vars=[
+                  'team_rating', 'first_kills'])
+plt.show()
 
 print()
 
 print(dados.describe().round(2))
-
 
 dados = dados.drop('_id', axis=1)
 dados = dados.drop('team', axis=1)
