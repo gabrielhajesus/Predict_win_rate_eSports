@@ -14,7 +14,7 @@ print("Chrome Initialized")
 
 # Entrando no site do hltv
 driver.get(
-    "https://www.hltv.org/stats/teams?startDate=2022-10-28&endDate=2023-04-28&minMapCount=30")
+    "https://www.hltv.org/stats/teams?startDate=2022-10-28&endDate=2023-04-28&minMapCount=10")
 
 # Concorda com os cookies do site
 time.sleep(1)

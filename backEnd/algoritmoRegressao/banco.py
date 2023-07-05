@@ -12,6 +12,10 @@ class Banco:
         teams = db.teams
         return teams
 
+    def teams_details(db):
+        teams_details = db.teams_details
+        return teams_details
+
     def iem_rio(db):
         iem_rio = db.iem_rio
         return iem_rio

@@ -3,30 +3,33 @@ from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
 from banco import Banco
 from inicia_selenium import iniciaselenium
+import undetected_chromedriver as uc
+import chromedriver_autoinstaller
 
 # Conexão com o Mongodb
 banco_de_dados = Banco.inicia_banco()
-iem_rio = Banco.iem_rio(banco_de_dados)
-iem_rio_partidas = Banco.iem_rio_partidas(banco_de_dados)
-
+campeonatos = Banco.campeonatos(banco_de_dados)
+partidas = Banco.partidas(banco_de_dados)
 
 # Definindo os cards para extração
 cards = []
 
 # Acessar o banco e pegar as tabelas necessarias
 matches = []
-for match in iem_rio.find():
+for match in campeonatos.find():
     matches.append(match)
 
 n = 1
-numero_da_pagina = 29
 
+contador_de_paginas = 0
 # Rodando cada partida
 for match in matches:
-    if match['numero_partida'] <= 8:
+
+    if contador_de_paginas < 150:
         # Iniciando o Selenium para cada partida
         driver = iniciaselenium.inicia()
-        print("Faltam " + str(numero_da_pagina))
+        print("Do campeonato " + match['campeonato'] +
+              " partida numero = " + str(match['numero_partida']))
 
         # Entrando no link da partida
         driver.get(
@@ -47,7 +50,6 @@ for match in matches:
         link = paginaatual.find('div', {'class': 'matchstats'}).find(
             'div', {'class': 'flexbox nowrap stats-type'}).find('a').get('href')
 
-        # Iniciando o Selenium para a pagina detalhada
         driver = iniciaselenium.inicia()
 
         driver.get(
@@ -66,33 +68,36 @@ for match in matches:
         # Retirando os dados necessarios
         card = {}
 
-        card['_id'] = numero_da_pagina
-
         card['team_1'] = str(match['team_1']).replace(
             '\n', '')
+        card['team_1_img'] = paginadetalhada.find('div', {'class': 'contentCol'}).find(
+            'div', {'class': 'wide-grid'}).div.div.div.div.findNextSibling().img.get('src')
         card['team_2'] = str(match['team_2']).replace('\n', '')
+        card['team_2_img'] = paginadetalhada.find('div', {'class': 'contentCol'}).find(
+            'div', {'class': 'wide-grid'}).div.div.div.div.findNextSibling().findNextSibling().img.get('src')
 
         print("Pagina detalha da partida " +
               card['team_1'] + " X " + card['team_2'])
 
         card['team_victory'] = str(match['team_victory']).replace('\n', '')
-        card['victory_score'] = match['victory_score']
+        card['victory_score'] = match['victory_score'].replace(' ', '')
 
         card['team_defeat'] = str(match['team_defeat']).replace('\n', '')
-        card['defeat_score'] = match['defeat_score']
+        card['defeat_score'] = match['defeat_score'].replace(' ', '')
 
         card['partida'] = []
 
         if match['numero_de_rodadas'] > 1:
             # entrando em cada mapa e sabendo quais são os detalhes
             rodadas = paginadetalhada.find('div', {'class': 'contentCol'}).find(
-                'div', {'class': 'stats-section'}).find(
+                'div', {'class': 'stats-section'}).find('div', {"class": "stats-match-maps"}).find(
                 'div', {'class': 'columns'}).find_all('a')
+            print((len(rodadas)))
             mapaatual = 1
             for rodada in rodadas:
                 if mapaatual > 1:
                     partida = {}
-                    # Iniciando o Selenium
+
                     driver = iniciaselenium.inicia()
                     print("Pegando os dados do mapa" + str(mapaatual))
 
@@ -119,9 +124,9 @@ for match in matches:
 
                     # team rating
                     partida['team_rating'] = paginastatusdetalhada.find('div', {'class': 'contentCol'}).find(
-                        'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.findNextSibling().findNextSibling().find('div', {'class': 'right'}).getText()
 
-                    # first kill
+                        # first kill
+                        'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.findNextSibling().findNextSibling().find('div', {'class': 'right'}).getText()
                     partida['first_kills'] = paginastatusdetalhada.find('div', {'class': 'contentCol'}).find(
                         'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.findNextSibling().findNextSibling().findNextSibling().find('div', {'class': 'right'}).getText()
 
@@ -131,7 +136,6 @@ for match in matches:
 
                     card['partida'].append(partida)
                     mapaatual = mapaatual+1
-
                     driver.quit()
                 else:
                     mapaatual = mapaatual + 1
@@ -151,16 +155,19 @@ for match in matches:
 
             # team rating
             partida['team_rating'] = paginadetalhada.find('div', {'class': 'contentCol'}).find(
-                'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.findNextSibling().findNextSibling().find('div', {'class': 'right'}).getText()
+                'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.findNextSibling().find('div', {'class': 'right'}).getText()
 
             # first kill
             partida['first_kills'] = paginadetalhada.find('div', {'class': 'contentCol'}).find(
-                'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.findNextSibling().findNextSibling().findNextSibling().find('div', {'class': 'right'}).getText()
+                'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.findNextSibling().findNextSibling().find('div', {'class': 'right'}).getText()
 
             # clutches
             partida['clutches_won'] = paginadetalhada.find('div', {'class': 'contentCol'}).find(
-                'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.findNextSibling().findNextSibling().findNextSibling().findNextSibling().find('div', {'class': 'right'}).getText()
+                'div', {'class': 'wide-grid'}).find('div', {'class': 'col'}).div.div.findNextSibling().findNextSibling().findNextSibling().find('div', {'class': 'right'}).getText()
 
             card['partida'].append(partida)
-        iem_rio_partidas.insert_one(card)
-    numero_da_pagina = numero_da_pagina - 1
+        partidas.insert_one(card)
+        contador_de_paginas = contador_de_paginas + 1
+
+
+driver.quit()

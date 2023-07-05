@@ -10,6 +10,7 @@ class iniciaselenium:
         # Definindo o navegador do drive como Chrome
         options = webdriver.ChromeOptions()
         options.add_experimental_option('excludeSwitches', ['enable-logging'])
+        options.add_argument("--headless=new")
 
         # Executando drive do google
         driver = webdriver.Chrome(service=Service(

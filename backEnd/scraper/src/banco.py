@@ -12,10 +12,18 @@ class Banco:
         teams = db.teams
         return teams
 
-    def iem_rio(db):
-        iem_rio = db.iem_rio
-        return iem_rio
+    def teams_details(db):
+        teams_details = db.teams_details
+        return teams_details
 
-    def iem_rio_partidas(db):
-        iem_rio_partidas = db.iem_rio_partidas
-        return iem_rio_partidas
+    def campeonatos(db):
+        campeonatos = db.campeonatos
+        return campeonatos
+
+    def partidas(db):
+        partidas = db.partidas
+        return partidas
+
+    def dataset_iem_rio(db):
+        dataset_iem_rio = db.dataset_iem_rio
+        return dataset_iem_rio
